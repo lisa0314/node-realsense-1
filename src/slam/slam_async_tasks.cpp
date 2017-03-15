@@ -11,6 +11,7 @@
 #include "gen/nan__occupancy_map_data.h"
 #include "gen/nan__tracking_result.h"
 #include "gen/array_helper.h"
+#include "gen/generator_helper.h"
 #include "common/camera-options/camera_options_host_instance.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -457,4 +458,49 @@ void SaveRelocalizationMapTask::WorkerThreadExecute() {
 
 SlamPayload<std::string>* SaveRelocalizationMapTask::GetPayload() {
   return reinterpret_cast<SlamPayload<std::string>*>(AsyncTask::GetPayload());
+}
+/////////////////////////////////////////////////////////////////////////////
+GetRelocalizationPoseTask::GetRelocalizationPoseTask() {
+  task_tag = "getRelocalizationPose() task";
+}
+
+GetRelocalizationPoseTask::~GetRelocalizationPoseTask() {
+}
+
+void GetRelocalizationPoseTask::WorkerThreadExecute() {
+  auto payload = GetPayload();
+  result_status = payload->GetSlamModule()->GetRelocalizationPose(
+      payload->data());
+  task_state =
+      (result_status.id() >= rs::core::status_no_error) ? Successful : Failed;
+}
+
+SlamPayload<float*>* GetRelocalizationPoseTask::GetPayload() {
+  return reinterpret_cast<SlamPayload<float*>*>(AsyncTask::GetPayload());
+}
+/////////////////////////////////////////////////////////////////////////////
+GetRelocalizationPoseTask::GetRelocalizationPoseTask() {
+  task_tag = "getRelocalizationPose() task";
+}
+
+GetRelocalizationPoseTask::~GetRelocalizationPoseTask() {
+}
+
+void GetRelocalizationPoseTask::WorkerThreadExecute() {
+  auto payload = GetPayload();
+  result_status = payload->GetSlamModule()->GetRelocalizationPose(
+      payload->data());
+  task_state =
+      (result_status.id() >= rs::core::status_no_error) ? Successful : Failed;
+}
+
+SlamPayload<float*>* GetRelocalizationPoseTask::GetPayload() {
+  return reinterpret_cast<SlamPayload<float*>*>(AsyncTask::GetPayload());
+}
+
+v8::Local<v8::Value> GetRelocalizationPoseTask::GetResolved() {
+  auto data = GetPayload()->data();
+  ArrayHelper helper;
+  helper.FromArrayT<float>(data, 16);
+  return static_cast<v8::Local<v8::Array>>(ArrayHelper(helper));
 }
